@@ -1,0 +1,116 @@
+<project name="Hello" default="clean" basedir=".">
+<!-- set global properties -->
+<property name="program_name" value="Hello"/>
+
+<property name="proguard" value="PATH_TO_PROGUARD"/>
+<property name="midp_home" value="PATH_TO_WTK"/>
+<property name="cldcapi10" value="${midp_home}/lib/cldcapi10.jar"/>
+<property name="cldcapi11" value="${midp_home}/lib/cldcapi11.jar"/>
+<property name="midp10_lib" value="${midp_home}/lib/midpapi10.jar"/>
+<property name="midp20_lib" value="${midp_home}/lib/midpapi20.jar"/>
+<property name="midp21_lib" value="${midp_home}/lib/midpapi21.jar"/>
+<property name="jsr226_lib" value="${midp_home}/lib/jsr226.jar"/>
+
+<property name="top" value="."/>
+<property name="src" value="src"/>
+<property name="res" value="res"/>
+<property name="build" value="build"/>
+<property name="obf" value="obf"/>
+<property name="deploy" value="deploy"/>
+
+<target name="clean">
+<delete dir="${build}"/>
+<delete dir="${deploy}"/>
+<delete dir="${obf}"/>
+</target>
+
+<target name="init" depends="clean">
+<tstamp/>
+<mkdir dir="${build}"/>
+<mkdir dir="${deploy}"/>
+<mkdir dir="${obf}"/>
+</target>
+
+<target name="compile">
+<mkdir dir="${build}/classes"/>
+<javac destdir="${build}/classes" srcdir="src" bootclasspath="${midp21_lib};${cldcapi11};${jsr226_lib}" target="1.1" source="1.2"/>
+</target>
+
+<target name="preverify">
+<mkdir dir="${build}/preverified"/>
+<exec executable="${midp_home}/bin/preverify">
+<arg line="-classpath  ${cldcapi11};${midp21_lib};${jsr226_lib}"/>
+<arg line="-target CLDC1.0"/>
+<arg line="-d ${build}/preverified"/>
+<arg line="${build}/classes"/>
+</exec>
+</target>
+
+<target name="dist">
+<mkdir dir="${build}/bin"/>
+<jar basedir="${build}/preverified" jarfile="${build}/bin/${program_name}.jar" manifest="bin/MANIFEST.MF">
+<fileset dir="${top}/${res}">
+</fileset>
+</jar>
+<copy file="bin/${program_name}.jad" tofile="${build}/bin/${program_name}.jad"/>
+</target>
+
+<target name="obfuscate">
+<java fork="yes" classname="proguard.ProGuard" classpath="${proguard}">
+<arg line="-libraryjars ${cldcapi11};${midp21_lib};${jsr226_lib}"/>
+<arg line="-injars ${build}/bin/${program_name}.jar"/>
+<arg line="-outjar ${obf}/${program_name}.jar"/>
+<arg line="-keep 'public class * extends javax.microedition.midlet.MIDlet'"/>
+</java>
+<!-- UnJAR Obfuscated JAR -->
+<unjar src="${top}/${obf}/${program_name}.jar" dest="${top}/${obf}/extract" />
+</target>
+
+<!-- Preverify the Obfuscated classes -->
+<target name="preverifyobf">
+<mkdir dir="${build}/preverifiedobf"/>
+<exec executable="${midp_home}/bin/preverify">
+<arg line="-classpath  ${cldcapi11};${midp21_lib};${jsr226_lib}"/>
+<arg line="-d ${build}/preverifiedobf"/>
+<arg line="${obf}/extract"/>
+</exec>
+</target>
+
+<!-- Re-Package a new Jar with the obfuscated classes -->
+<target name="distobf">
+<copy file="${build}/bin/${program_name}.jar" todir="${build}/bin/${program_name}-orig.jar"/>
+<mkdir dir="${build}/bin"/>
+<jar basedir="${build}/preverifiedobf"
+jarfile="${build}/bin/${program_name}.jar"
+manifest="bin/MANIFEST.MF">
+<fileset dir="${top}/${res}">
+</fileset>
+</jar>
+<copy file="bin/${program_name}.jad" tofile="${build}/bin/${program_name}.jad"/>
+</target>
+
+<target name="JSRTask">
+<taskdef name="jsr" classname="JarSizeReplacerTask" />
+</target>
+ 
+<target name="jsr" depends="JSRTask" description="jsr">
+<jsr jarfile="${build}/bin/${program_name}.jar" descriptortemplatefile="bin/${program_name}.jad" destfile="${build}/bin/${program_name}.jad" />
+</target>
+
+
+<target name="deploy">
+<copy file="${build}/bin/${program_name}.jad" tofile="${top}/${deploy}/${program_name}.jad"/>
+<copy file="${build}/bin/${program_name}.jar" tofile="${top}/${deploy}/${program_name}.jar"/>
+</target>
+
+<target name="run">
+<exec executable="${midp_home}/bin/emulator">
+<arg line="-Xdescriptor:${build}/bin/${program_name}.jad"/>
+</exec>
+</target>
+
+<target name="all-non-obf" depends="init,compile,preverify,dist"/>
+<target name="all-obf" depends="init,compile,preverify,dist,obfuscate,preverifyobf,distobf"/>
+<target name="all-obf-jsr" depends="init,compile,preverify,dist,obfuscate,preverifyobf,distobf,jsr"/>
+<target name="all-run" depends="all-obf,run"/>
+</project>

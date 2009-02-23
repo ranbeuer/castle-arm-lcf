@@ -1,0 +1,16 @@
+Fecha de última actualización: 	23 de Febrero de 2008
+Actualizado por:				Angel Rueda
+
+Para compilar el codigo es necesario tener ANT ( http://ant.apache.org/ )
+Para actualizar el tamaño del MIDlet en el JAD, es necesario crear un task 
+para ANT ( http://www.nilab.info/resource/project/jsr/ )
+
+Para compilar: 	ant all-obf     (crea jar sin actualizar el valor del midlet size en el jad)
+			ant all-obf-jsr (crea jar y jad con los valores correctos)
+			ant deploy 	    (copia el jar y el jad a la carpeta deploy :) )
+
+
+Dudas: correodeangelalberto at gmail punto com
+
+
+
