@@ -20,13 +20,11 @@ import javax.microedition.io.*;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 
-
 public class Diego extends Canvas implements Runnable
 {
-	final int W = 240;
-	final int H = 320;
+	int W;
+	int H;
 	boolean done;
-	Mandy myMIDlet;
 	Image bb = null;
 	Graphics g = null;
 	int i=0;
@@ -36,45 +34,38 @@ public class Diego extends Canvas implements Runnable
 	long  first = 0;
 	long  current = 0;
 	
-	Image pov;
+	public static final int STATE_LOAD = 		0;
+	public static final int STATE_SPLASH = 	1;
+	public static final int STATE_PRESS5 = 	2;
+	public static final int STATE_MAIN_MENU = 	3;
+	public static final int STATE_MAIN_LOOP = 	4;
+	public static final int STATE_PAUSE = 		5;
 	
-	public Diego(Mandy midlet)
+	public int state;	
+	
+	public Diego(int w, int h)
 	{	
-		myMIDlet = midlet;
 		done = false;
+		
+		W = width;
+		H = height;
+		
 		new Thread(this).start();
 		if(bb==null)
 		{
 			bb = Image.createImage(W,H);
 			g = bb.getGraphics();
 			first = System.currentTimeMillis();
-			
-			try
-			{
-				pov = Image.createImage("/s.JPG");
-			}
-			catch(Exception ioe)
-			{
-				System.out.println(ioe);
-			}
-			
 		}
 	}
 	
 	public void paint(Graphics _g)
 	{
-	//back buffer
 	
-	if(myMIDlet.paused) 
+	if( state == STATE_PAUSE)
 	{
 		return;
 	}
-	
-	/*g.setColor(0x000000);
-	g.fillRect(0,0,W,H);*/
-	
-	g.drawImage(pov,0,0,Graphics.TOP| Graphics.LEFT);
-	
 	current = System.currentTimeMillis();
 	fps++;
 	if((current - first) > 1000)
