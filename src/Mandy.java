@@ -21,38 +21,33 @@ import javax.microedition.lcdui.*;
 public class Mandy extends MIDlet
 {
 	Diego myCanvas=null;
-	MIDlet myMydlet;
-	public boolean paused=false;	
+	MIDlet myMydlet;	
 	
 	public Mandy()
 	{
-		System.out.println("In Mandy constructor");
 		myMydlet = this;
 	}
 	
 	public void startApp()
 	{	
-		paused = false;
 		if(myCanvas == null)
 		{
-			myCanvas = new Diego(this);
-			myCanvas.setFullScreenMode(true);
+			myCanvas = new Diego(240, 320);			
 		}
-		
-		System.out.println("Start App");
+		myCanvas.setFullScreenMode(true);
 		Display.getDisplay(myMydlet).setCurrent(myCanvas);
 	}
 	
 	public void pauseApp()
 	{	
-		paused = true;
-		myCanvas.setFullScreenMode(true);
+		myCanvas.state = myCanvas.STATE_PAUSE;
+		
+		myCanvas.setFullScreenMode(false);
 		Thread.yield();
 	}
 	
 	public void destroyApp(boolean inconditional)
 	{	
-		System.out.println("Destroy MIDlet");
 		myCanvas.setFullScreenMode(false);
 		notifyDestroyed();
 	}
