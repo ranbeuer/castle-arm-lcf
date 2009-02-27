@@ -15,36 +15,28 @@
     along with LAP.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import javax.microedition.midlet.MIDlet;
-
 /*
-	Esta clase se llama Mandy debido a que en los tutoriales de Sun
-	sobre Java ME, el MIDlet de ejemplo es nombrado asi.
+	Andrew es una maquina de estados, un robot.
+	Un robot como Andrew, el hombre Bicentenario.
 */
-public class Mandy extends MIDlet
-{	
-	Jesus jesus;
+
+public class Andrew
+{
+	public static final int INVALID		= -1;
+	public static final int LOAD 		= 0;
+	public static final int SPLASH 		= 1;
+	public static final int PRESS5 		= 2;
+	public static final int MAIN_MENU 	= 3;
+	public static final int MAIN_LOOP 	= 4;
+	public static final int PAUSE 		= 5;
+	public static final int DONE		= 6;
 	
-	public Mandy()
+	public static int current_state = INVALID;
+	public static int last_state 	= INVALID;
+	
+	public static void setState(int state)
 	{
-		jesus=null;
-	}
-	
-	public void startApp()
-	{	
-		if(jesus == null)
-		{
-			jesus = new Jesus(this);
-		}
-	}
-	
-	public void pauseApp()
-	{		
-		Thread.yield();
-	}
-	
-	public void destroyApp(boolean inconditional)
-	{	
-		notifyDestroyed();
+		last_state = current_state;
+		current_state = state;
 	}
 }

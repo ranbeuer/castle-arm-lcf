@@ -14,93 +14,94 @@
     You should have received a copy of the GNU General Public License
     along with LAP.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 import javax.microedition.io.*;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 
-public class Diego extends Canvas implements Runnable
+
+/*
+	Esta clase se llama Diego en honor a Diego Rivera.
+	Diego rivera era un pintor.
+	Canvas == Lienzo.
+*/
+public class Diego extends Canvas
 {
-	int W;
-	int H;
-	boolean done;
 	Image bb = null;
 	Graphics g = null;
-	int i=0;
 	
-	int fps = 0;
-	int cur_fps = 0;
-	long  first = 0;
-	long  current = 0;
-	
-	public static final int STATE_LOAD = 		0;
-	public static final int STATE_SPLASH = 	1;
-	public static final int STATE_PRESS5 = 	2;
-	public static final int STATE_MAIN_MENU = 	3;
-	public static final int STATE_MAIN_LOOP = 	4;
-	public static final int STATE_PAUSE = 		5;
-	
-	public int state;	
+	int W;
+	int H;
 	
 	public Diego(int w, int h)
 	{	
-		done = false;
+		W = w;
+		H = h;
 		
-		W = width;
-		H = height;
-		
-		new Thread(this).start();
-		if(bb==null)
-		{
-			bb = Image.createImage(W,H);
-			g = bb.getGraphics();
-			first = System.currentTimeMillis();
-		}
+		bb = Image.createImage(W,H);
+		g = bb.getGraphics();
 	}
 	
 	public void paint(Graphics _g)
 	{
+		g.setColor(0x000000);
+		g.drawRect(0,0,W,H);
+		g.setColor(0xFF0000);
 	
-	if( state == STATE_PAUSE)
-	{
-		return;
-	}
-	current = System.currentTimeMillis();
-	fps++;
-	if((current - first) > 1000)
-	{
-		cur_fps=fps;
-		fps = 0;
-		first = current;
-	}
-	
-	g.setColor(0xff0000);
-	g.drawString("fps: " + cur_fps,0,0,Graphics.TOP|Graphics.LEFT);
-
-	
-	_g.drawImage(bb,0,0,Graphics.TOP| Graphics.LEFT);
-	
-	}
-	
-	public void run()
-	{
-		
-		
-		do
+		switch(Andrew.current_state)
 		{
-			try
-			{
-				Thread.sleep(10);
-			} 
-			catch(Exception e)
-			{
-			
-			}
-			repaint();
-		}
-		while(!done);
+		case Andrew.PAUSE:
+			return;
+	
+		case Andrew.INVALID:
+			Andrew.setState(Andrew.LOAD);
+			return;
+	
+		case Andrew.LOAD:
+			g.drawString("STATE: LOAD", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.SPLASH);
+			break;
 		
+		case Andrew.SPLASH:
+			g.drawString("STATE: SPLASH", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.PRESS5);
+			break;
+		
+		case Andrew.PRESS5:
+			g.drawString("STATE: PRESS 5", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.MAIN_MENU);
+			break;
+		
+		case Andrew.MAIN_MENU:
+			g.drawString("STATE: MAIN MENU", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.MAIN_LOOP);
+			break;
+		
+		case Andrew.MAIN_LOOP:
+			g.drawString("STATE: MAIN LOOP", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.DONE);
+			break;
+			
+		case Andrew.DONE:
+			g.drawString("STATE: DONE", 0, 0, Graphics.HCENTER | Graphics.TOP);
+			Andrew.setState(Andrew.INVALID);
+			Jesus.done = true;
+			break;
+		}
+	
+		_g.drawImage(bb,0,0,Graphics.TOP| Graphics.LEFT);
+	}
+	
+	public void showNotify()
+	{
+		setFullScreenMode(true);
+	}
+	
+	protected void hideNotify()
+	{
+		setFullScreenMode(false);
 	}
 
 }
