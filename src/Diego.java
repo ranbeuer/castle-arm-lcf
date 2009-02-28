@@ -55,7 +55,7 @@ public class Diego extends Canvas
 	
 	protected void keyPressed(int keyCode)
 	{
-		jesus.whichKey(keyCode);
+		jesus.whichKey(getGameAction(keyCode));
 	}
 	
 	protected void keyReleased(int keyCode)
