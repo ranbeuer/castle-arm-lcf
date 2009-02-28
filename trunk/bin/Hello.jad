@@ -4,7 +4,6 @@ MIDlet-Jar-Size: 1010
 MIDlet-Jar-URL: Hello.jar
 MIDlet-Name: Hello
 MIDlet-Vendor: angel rueda.
-MIDlet-Version: 1.0
+MIDlet-Version: 0.1
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
-MIDlet-Permissions: javax.microedition.io.Connector.file.read
