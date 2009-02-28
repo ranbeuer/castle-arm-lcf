@@ -17,10 +17,7 @@
 
 import javax.microedition.lcdui.*;
 
-/*
-	Siguiendo la tradiccion de nombrar nuestras clases como personas,
-	hemos nombrado a esta clase Jesus.
-	
+/*	
 	Jesus es el nombre del administrador de sistemas de la empresa 
 	en la que trabajo y esta clase administra el sistema.
 */
@@ -38,6 +35,7 @@ public class Jesus implements Runnable
 	*/
 	boolean done=false;
 	boolean keyPressed = false;
+	int key;
 	/*
 		metodos
 	*/
@@ -46,11 +44,11 @@ public class Jesus implements Runnable
 		diego = new Diego(240, 320, this);
 		Display.getDisplay(midlet).setCurrent(diego);
 		mandy = midlet;
-		abi = new Abi("");
+		abi = new Abi();
 		
 		new Thread(this).start();
 	}
-	public void whichKey(int keyCode)
+	public void whichKey(int key)
 	{
 		keyPressed = true;
 	}
