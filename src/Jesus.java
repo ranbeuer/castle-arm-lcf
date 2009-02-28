@@ -32,19 +32,27 @@ public class Jesus implements Runnable
 	*/
 	Diego diego=null;
 	Mandy mandy=null;
+	public Abi abi=null;
 	/*
 		variables
 	*/
-	public static boolean done=false;
+	boolean done=false;
+	boolean keyPressed = false;
 	/*
 		metodos
 	*/
 	public Jesus(Mandy midlet)
-	{
-		new Thread(this).start();
-		diego = new Diego(240, 320);
+	{		
+		diego = new Diego(240, 320, this);
 		Display.getDisplay(midlet).setCurrent(diego);
 		mandy = midlet;
+		abi = new Abi("");
+		
+		new Thread(this).start();
+	}
+	public void whichKey(int keyCode)
+	{
+		keyPressed = true;
 	}
 	
 	public void run()
@@ -60,11 +68,73 @@ public class Jesus implements Runnable
 			}
 			
 			diego.repaint();
+			this.update();
 		}
 		while(!done);
 		
 		mandy.destroyApp(true);
 		System.gc();
 	}
-
+	
+	void update()
+	{
+		if(keyPressed == true)
+		{
+			switch(Andrew.current_state)
+			{
+				case Andrew.PRESS5:
+					Andrew.setState(Andrew.MAIN_MENU);
+					break;
+				
+				case Andrew.MAIN_MENU:
+					Andrew.setState(Andrew.MAIN_LOOP);
+					break;
+					
+				case Andrew.MAIN_LOOP:
+					Andrew.setState(Andrew.DONE);
+					done = true;
+					break;
+			}
+			keyPressed = false;
+		}
+	}
+	
+	void draw(Graphics g)
+	{
+		switch(Andrew.current_state)
+		{
+		case Andrew.PAUSE:
+			return;
+	
+		case Andrew.INVALID:
+			Andrew.setState(Andrew.LOAD);
+			return;
+	
+		case Andrew.LOAD:
+			g.drawString("STATE: LOAD", 0, 0, Graphics.LEFT | Graphics.TOP);
+			Andrew.setState(Andrew.SPLASH);
+			break;
+		
+		case Andrew.SPLASH:
+			g.drawString("STATE: SPLASH", 0, 0, Graphics.LEFT | Graphics.TOP);
+			Andrew.setState(Andrew.PRESS5);
+			break;
+		
+		case Andrew.PRESS5:
+			g.drawString("STATE: PRESS 5", 0, 0, Graphics.LEFT | Graphics.TOP);
+			break;
+		
+		case Andrew.MAIN_MENU:
+			abi.paint(g);
+			break;
+		
+		case Andrew.MAIN_LOOP:
+			g.drawString("STATE: MAIN LOOP", 0, 0, Graphics.LEFT | Graphics.TOP);
+			break;
+			
+		case Andrew.DONE:
+			g.drawString("STATE: DONE", 0, 0, Graphics.LEFT | Graphics.TOP);
+			break;
+		}
+	}
 }
